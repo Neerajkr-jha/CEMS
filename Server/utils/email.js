@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 const dotenv = require("dotenv");
 
 dotenv.config();
-
+// Create a transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -10,6 +10,7 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASS
     },
 })
+// senfding email for booking confirmation
 const sendBookingEmail= async (email, bookingDetails) => {
     try {
         const mailOptions = { 
@@ -26,7 +27,7 @@ const sendBookingEmail= async (email, bookingDetails) => {
         console.error("Error sending booking email:", error);
     }
 };
-
+// sending email for otp verification
 const sendOtpEmail = async (userEmail, otp, type) => {
     try {
         const title = type === "account_verification" ? "Account Verification" : "Booking Confirmation";
@@ -45,7 +46,7 @@ const sendOtpEmail = async (userEmail, otp, type) => {
                    </div>`
         };
         await transporter.sendMail(mailOptions);
-        console.log(`OTP sent to ${email} for ${type}`);
+        console.log(`OTP sent to ${userEmail} for ${type}`);
     } catch (error) {
         console.error("Error sending OTP email:", error);
     }
