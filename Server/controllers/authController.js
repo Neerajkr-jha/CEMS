@@ -29,7 +29,7 @@ const registerUser = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = User.create({ name, email, password: hashedPassword, role: "user", isVerified: false });
+        const user =  await User.create({ name, email, password: hashedPassword, role: "user", isVerified: false });
 
         // otp generation and sending email
 
@@ -37,11 +37,12 @@ const registerUser = async (req, res) => {
 
         console.log(`OTP for ${email}: ${otp}`);
         await OTP.create({ email, otp, action: 'account_verification' });
+
         await sendOtpEmail(email, otp, "account_verification");
 
         res.status(201).json({
             message: "User registered successfully. Please check your email for the OTP to verify your account.",
-            email: user.email,
+            email:user.email,
         });
 
     } catch (error) {
@@ -59,7 +60,7 @@ const loginUser = async (req, res) => {
     }
 
     // Check if the provided password matches the user's password
-    const passwordMatch = await bcrypt.compare(password, userExists.password);
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
         return res.status(400).json({ message: "Invalid credentials, Please check your email and password" });

@@ -17,15 +17,24 @@ const eventSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    category: { 
+    category: {
         type: String,
         required: true,
     },
     ticketPrice: {
         type: Number,
         required: true,
+        default: 0,
     },
-    imageUrl: {
+    totalSeats: {
+        type: Number,
+        required: true,
+    },
+    availableSeats: {
+        type: Number,
+        required: true,
+    },
+    image: {
         type: String,
         required: true,
     },
@@ -34,6 +43,6 @@ const eventSchema = new mongoose.Schema({
         ref: 'User',
         required: true,
     },
-},{timestamps:true});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);

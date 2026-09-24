@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true })); // to parse incoming URL-encode
 // routes
 app.use ('/api/auth',authRoutes);
 app.use ('/api/events',eventsRoutes);
-//app.use ('/api/booking',bookingRoutes);
+app.use ('/api/bookings',bookingRoutes);
 
 // database connection
 mongoose.connect(process.env.MONGO_URI)
