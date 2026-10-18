@@ -18,12 +18,16 @@ const bookingSchema=new mongoose.Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ['unpaid', 'paid'],
-        default: 'unpaid'
+        enum: ['not_paid', 'paid'],
+        default: 'not_paid'
     },
     amount: {
         type: Number,
         required: true
+    },
+    bookedAt: {
+        type: Date,
+        default: Date.now 
     }
 },{
     timestamps: true
