@@ -139,13 +139,13 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleConfirmBooking = async (id, paymentStatus) => {
+  const handleConfirmBooking = async (id) => {
     setActionId(id);
     setError("");
     setSuccess("");
 
     try {
-      await api.put(`/bookings/${id}/confirm`, { paymentStatus });
+      await api.put(`/bookings/${id}/confirm`);
       setSuccess("Booking updated successfully.");
       await fetchData();
     } catch (err) {
@@ -651,29 +651,17 @@ const AdminDashboard = () => {
                       </div>
 
                       {isPending && (
-                        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+                        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                           <button
                             type="button"
                             disabled={actionId === booking._id}
                             onClick={() =>
-                              handleConfirmBooking(booking._id, "paid")
+                              handleConfirmBooking(booking._id)
                             }
                             className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-xs font-semibold text-green-700 transition hover:bg-green-600 hover:text-white disabled:opacity-50 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
                           >
                             <FaCheck />
-                            Approve Paid
-                          </button>
-
-                          <button
-                            type="button"
-                            disabled={actionId === booking._id}
-                            onClick={() =>
-                              handleConfirmBooking(booking._id, "not_paid")
-                            }
-                            className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-100 disabled:opacity-50 dark:border-gray-700 dark:bg-[#252932] dark:text-gray-300 dark:hover:bg-gray-700"
-                          >
-                            <FaCheck />
-                            Approve Unpaid
+                            Confirm booking
                           </button>
 
                           <button

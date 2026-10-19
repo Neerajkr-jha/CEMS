@@ -59,40 +59,53 @@ const bookEvent = async (req, res) => {
 
 }
 
+
 const confirmBooking = async (req, res) => {
     try {
-        const paymentStatus = req.body.paymentStatus;
-        if (!['paid', 'not_paid'].includes(paymentStatus)) {
-            return res.status(400).json({ message: 'Invalid payment status' });
-        }
         const booking = await Booking.findById(req.params.id);
+
         if (!booking) {
-            return res.status(404).json({ message: 'Booking not found' });
+            return res.status(404).json({
+                message: 'Booking not found'
+            });
         }
-        if (booking.status === 'confirmed') {
-            return res.status(400).json({ message: 'Booking is already confirmed' });
+
+        if (booking.status !== 'pending') {
+            return res.status(400).json({
+                message: 'Only pending bookings can be confirmed'
+            });
         }
 
         const event = await Event.findById(booking.eventId);
+
         if (!event) {
-            return res.status(404).json({ message: 'Event not found' });
+            return res.status(404).json({
+                message: 'Event not found'
+            });
         }
 
+        // Update only the booking status
         booking.status = 'confirmed';
-        if (paymentStatus) {
-            booking.paymentStatus = paymentStatus;
-        }
         await booking.save();
 
-        //admin confirmation for booking, send email to user
+        // Send confirmation email
+        // Note: req.user.email is the admin's email.
+        // Use the booking owner's email if you want to notify the user.
 
-        await sendBookingEmail(req.user.email, event.title, booking._id);
-        res.status(200).json({ message: 'Booking confirmed successfully' });
+        return res.status(200).json({
+            message: 'Booking confirmed successfully'
+        });
+
     } catch (error) {
-        res.status(500).json({ message: 'Error confirming booking', error: error.message });
-        console.log(error);
+        console.error("Confirm booking error:", error);
+
+        return res.status(500).json({
+            message: "Error confirming booking",
+            error: error.message
+        });
     }
-}
+};
+
 
 const getMyBookings = async (req, res) => {
     try {

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import api from "../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
+import RazorpayCheckout from "@razorpay/razorpay-js/checkout";
 import {
   FaTicketAlt,
   FaTimesCircle,
@@ -52,9 +53,7 @@ const UserDashboard = () => {
 
   const cancelBooking = async (id) => {
     if (
-      !window.confirm(
-        "Are you sure you want to cancel this booking request?"
-      )
+      !window.confirm("Are you sure you want to cancel this booking request?")
     ) {
       return;
     }
@@ -65,11 +64,59 @@ const UserDashboard = () => {
       await api.delete(`/bookings/${id}/cancel`);
       await fetchBookings();
     } catch (error) {
-      window.alert(
-        error.response?.data?.message || "Error cancelling booking"
-      );
+      window.alert(error.response?.data?.message || "Error cancelling booking");
     } finally {
       setCancellingId(null);
+    }
+  };
+
+  const payForBooking = async (booking) => {
+    try {
+      // Ask the backend to calculate the amount and create the order.
+      const { data } = await api.post("/payments/create-order", {
+        bookingId: booking._id,
+      });
+
+      const checkout = await RazorpayCheckout({
+        key: data.keyId,
+        order_id: data.orderId,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Gatherr",
+        description: "Event ticket payment",
+
+        handler: async (response) => {
+          try {
+            await api.post("/payments/verify", {
+              bookingId: booking._id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            alert("Payment successful!");
+            await fetchBookings();
+          } catch (error) {
+            alert(
+              error.response?.data?.message ||
+                "Payment verification failed. Please contact support if money was deducted.",
+            );
+          }
+        },
+      });
+
+      checkout.on("payment.failed", (response) => {
+        alert(
+          response.error?.description || "Payment failed. Please try again.",
+        );
+      });
+
+      checkout.open();
+    } catch (error) {
+      alert(
+        error.response?.data?.message ||
+          "Unable to start payment. Please try again.",
+      );
     }
   };
 
@@ -121,8 +168,7 @@ const UserDashboard = () => {
         </div>
 
         <span className="rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-600 dark:border-gray-700 dark:bg-[#1C1F26] dark:text-gray-300">
-          {bookings.length}{" "}
-          {bookings.length === 1 ? "booking" : "bookings"}
+          {bookings.length} {bookings.length === 1 ? "booking" : "bookings"}
         </span>
       </div>
 
@@ -189,13 +235,18 @@ const UserDashboard = () => {
                             {booking.status}
                           </span>
 
-                          {!isCancelled && booking.paymentStatus && (
-                            <span
-                              className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${paymentClass}`}
-                            >
-                              {booking.paymentStatus.replace(/_/g, " ")}
-                            </span>
-                          )}
+                          {!isCancelled &&
+                            booking.paymentStatus &&
+                            !(
+                              booking.status === "confirmed" &&
+                              booking.paymentStatus === "not_paid"
+                            ) && (
+                              <span
+                                className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${paymentClass}`}
+                              >
+                                {booking.paymentStatus.replace(/_/g, " ")}
+                              </span>
+                            )}
                         </div>
                       </div>
 
@@ -214,9 +265,7 @@ const UserDashboard = () => {
                           <span className="font-medium text-gray-700 dark:text-gray-300">
                             Amount:{" "}
                           </span>
-                          {booking.amount === 0
-                            ? "Free"
-                            : `₹${booking.amount}`}
+                          {booking.amount === 0 ? "Free" : `₹${booking.amount}`}
                         </p>
 
                         <p>
@@ -264,6 +313,22 @@ const UserDashboard = () => {
                     </span>
                   )}
                 </div>
+
+                {/* Payment option display if booking is confirmed and payment is not done */}
+
+                {booking.status === "confirmed" &&
+                  booking.paymentStatus === "not_paid" &&
+                  booking.amount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        payForBooking(booking);
+                      }}
+                      className="bg-gray-950 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 dark:bg-white dark:text-gray-950"
+                    >
+                      Pay Now · ₹{booking.amount}
+                    </button>
+                  )}
               </article>
             );
           })}
