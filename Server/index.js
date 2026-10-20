@@ -21,6 +21,9 @@ app.use(express.json()); // to parse incoming JSON requests from the client
 app.use(express.urlencoded({ extended: true })); // to parse incoming URL-encoded requests from the client
 
 // routes
+app.get('/', (req, res) => (
+    res.send('Welcome to Gatherr API')
+))
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/bookings', bookingRoutes);
