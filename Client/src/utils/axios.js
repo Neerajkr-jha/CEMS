@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api',
+    baseURL: 'https://gatherr-yfv3.onrender.com/api',
     headers:{
-        concat: 'application/json',
+        'Content-Type': 'application/json',
     }
 })
 
