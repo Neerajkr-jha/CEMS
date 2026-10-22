@@ -62,7 +62,8 @@ const bookEvent = async (req, res) => {
 
 const confirmBooking = async (req, res) => {
     try {
-        const booking = await Booking.findById(req.params.id);
+        const booking = await Booking.findById(req.params.id).populate("userId", "name email")
+            .populate("eventId", "title");;
 
         if (!booking) {
             return res.status(404).json({
@@ -91,6 +92,13 @@ const confirmBooking = async (req, res) => {
         // Send confirmation email
         // Note: req.user.email is the admin's email.
         // Use the booking owner's email if you want to notify the user.
+
+        await sendBookingEmail(booking.userId.email, {
+            userName: booking.userId.name,
+            eventTitle: booking.eventId.title,
+            amount: booking.amount,
+            bookingId: booking._id,
+        });
 
         return res.status(200).json({
             message: 'Booking confirmed successfully'

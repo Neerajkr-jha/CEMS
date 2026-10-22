@@ -1,16 +1,19 @@
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const { Resend } = require("resend");
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    pool: true,
-    maxConnections: 3,
-    maxMessages: 100,
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-    },
-});
+// const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     pool: true,
+//     maxConnections: 3,
+//     maxMessages: 100,
+//     auth: {
+//         user: process.env.EMAIL_USER,
+//         pass: process.env.EMAIL_PASS,
+//     },
+// });
+
+const resendClient = new Resend(process.env.RESEND_API_KEY);
 
 const BRAND = {
     name: "Gatherr",
@@ -152,15 +155,25 @@ const sendOtpEmail = async (userEmail, otp, type) => {
     `;
 
     try {
-        await transporter.sendMail({
+        const { data, error } = await resendClient.emails.send({
             from: `"Gatherr" <${process.env.EMAIL_USER}>`,
-            to: userEmail,
+            to: [userEmail],
             subject: `${title} | Gatherr`,
-            html: emailLayout(content, `${title} — your Gatherr verification code.`),
+            html: emailLayout(
+                content,
+                `${title} — your Gatherr verification code.`
+            ),
             text: `${title}\n\n${description}\nYour OTP is: ${otp}\nIt expires in 5 minutes.`,
         });
 
+        if (error) {
+            console.error("Resend OTP email error:", error);
+            throw new Error(error.message || "Failed to send OTP email");
+        }
+
+        console.log("OTP email accepted by Resend:", data?.id);
         return true;
+
     } catch (error) {
         console.error("OTP email error:", error.message);
         throw error;
@@ -176,6 +189,7 @@ const sendBookingEmail = async (email, bookingDetails) => {
         bookingId,
     } = bookingDetails;
 
+    //html and css content for the email
     const content = `
         <div style="display:inline-block;background:#e9f9ef;color:#187443;
                     padding:7px 12px;border-radius:20px;font-size:12px;
@@ -242,20 +256,32 @@ const sendBookingEmail = async (email, bookingDetails) => {
         </p>
     `;
 
+
     try {
-        await transporter.sendMail({
+        const { data, error } = await resendClient.emails.send({
             from: `"Gatherr" <${process.env.EMAIL_USER}>`,
-            to: email,
+            to: [email],
             subject: `Booking Confirmed: ${eventTitle} | Gatherr`,
-            html: emailLayout(content, `Your booking for ${eventTitle} is confirmed.`),
+            html: emailLayout(
+                content,
+                `Your booking for ${eventTitle} is confirmed.`
+            ),
             text: `Hi ${userName || "there"}, your booking for ${eventTitle} is confirmed.${bookingId ? ` Booking reference: ${bookingId}.` : ""}${amount != null ? ` Ticket amount: ₹${amount}.` : ""}`,
         });
 
+        if (error) {
+            console.error("Resend booking email error:", error);
+            throw new Error(error.message || "Failed to send booking email");
+        }
+
+        console.log("Booking email accepted by Resend:", data?.id);
         return true;
+
     } catch (error) {
         console.error("Booking email error:", error.message);
         throw error;
     }
+
 };
 
 module.exports = {
