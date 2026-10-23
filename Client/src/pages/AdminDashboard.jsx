@@ -181,7 +181,7 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="py-20 text-center text-gray-600 dark:text-gray-300">
+      <div className="grid min-h-[40vh] place-items-center px-4 text-center text-gray-600 dark:text-gray-300">
         Loading admin dashboard...
       </div>
     );
@@ -212,28 +212,53 @@ const AdminDashboard = () => {
   ).length;
 
   const inputClass =
-    "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-100 dark:border-gray-700 dark:bg-[#15171C] dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-800";
+    "min-h-12 w-full min-w-0 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-gray-500 focus:ring-2 focus:ring-gray-100 dark:border-gray-700 dark:bg-[#15171C] dark:text-white dark:placeholder:text-gray-500 dark:focus:border-gray-500 dark:focus:ring-gray-800";
 
   const labelClass =
     "mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300";
 
   const cardClass =
-    "rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#1C1F26]";
+    "min-w-0 rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-[#1C1F26]";
+
+  const stats = [
+    {
+      label: "Total Revenue",
+      value: `₹${revenue.toLocaleString("en-IN")}`,
+      description: "From paid, confirmed bookings",
+      icon: <FaMoneyBillWave />,
+      iconClass:
+        "bg-green-50 text-green-600 dark:bg-green-950/30 dark:text-green-400",
+    },
+    {
+      label: "Paid Clients",
+      value: paidClients,
+      description: "Unique users with paid bookings",
+      icon: <FaUsers />,
+      iconClass:
+        "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400",
+    },
+    {
+      label: "Pending Requests",
+      value: pendingBookings,
+      description: "Awaiting your decision",
+      icon: <FaClock />,
+      iconClass:
+        "bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400",
+    },
+  ];
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 py-4 px-4">
-      {/* Header */}
-      <section className="flex flex-col justify-between gap-5 rounded-2xl bg-gray-950 p-6 text-white dark:bg-[#1C1F26] sm:p-8 md:flex-row md:items-center">
-        <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">
+    <main className="mx-auto w-full max-w-[1600px] space-y-6 px-3 py-4 wrap-anywhere min-[480px]:space-y-8 min-[480px]:px-5 sm:px-6 lg:px-8">
+      {/* Dashboard header */}
+      <header className="flex min-w-0 flex-col gap-5 rounded-2xl bg-gray-950 p-4 text-white min-[480px]:p-6 sm:p-8 md:flex-row md:items-center md:justify-between dark:bg-[#1C1F26]">
+        <div className="min-w-0">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
             Gatherr Management
           </p>
-
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1 className="text-[clamp(1.5rem,4vw,2.25rem)] font-bold leading-tight tracking-tight">
             Admin Dashboard
           </h1>
-
-          <p className="mt-2 text-sm text-gray-300">
+          <p className="mt-2 text-sm leading-6 text-gray-300">
             Manage events and review registration requests.
           </p>
         </div>
@@ -245,18 +270,18 @@ const AdminDashboard = () => {
             setError("");
             setSuccess("");
           }}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-gray-950 transition hover:bg-gray-200 dark:bg-white dark:hover:bg-gray-200"
+          className="inline-flex min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-gray-950 transition hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 md:w-auto dark:bg-white dark:hover:bg-gray-200"
         >
           {showEventForm ? <FaTimes /> : <FaPlus />}
           {showEventForm ? "Close Form" : "Create New Event"}
         </button>
-      </section>
+      </header>
 
       {/* Feedback */}
       {error && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
+          className="wrap-break-word rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
         >
           {error}
         </div>
@@ -265,85 +290,65 @@ const AdminDashboard = () => {
       {success && (
         <div
           role="status"
-          className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300"
+          className="wrap-break-word rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300"
         >
           {success}
         </div>
       )}
 
       {/* Statistics */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <div className={`${cardClass} flex items-center justify-between p-5 sm:p-6`}>
-          <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Total Revenue
-            </p>
-            <h2 className="mt-2 text-3xl font-bold text-gray-950 dark:text-white">
-              ₹{revenue.toLocaleString("en-IN")}
-            </h2>
-            <p className="mt-1 text-xs text-gray-400">
-              From paid, confirmed bookings
-            </p>
-          </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-50 text-lg text-green-600 dark:bg-green-950/30 dark:text-green-400">
-            <FaMoneyBillWave />
-          </div>
-        </div>
-
-        <div className={`${cardClass} flex items-center justify-between p-5 sm:p-6`}>
-          <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Paid Clients
-            </p>
-            <h2 className="mt-2 text-3xl font-bold text-gray-950 dark:text-white">
-              {paidClients}
-            </h2>
-            <p className="mt-1 text-xs text-gray-400">
-              Unique users with paid bookings
-            </p>
-          </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-lg text-blue-600 dark:bg-blue-950/30 dark:text-blue-400">
-            <FaUsers />
-          </div>
-        </div>
-
-        <div className={`${cardClass} flex items-center justify-between p-5 sm:p-6`}>
-          <div>
-            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-              Pending Requests
-            </p>
-            <h2 className="mt-2 text-3xl font-bold text-gray-950 dark:text-white">
-              {pendingBookings}
-            </h2>
-            <p className="mt-1 text-xs text-gray-400">
-              Awaiting your decision
-            </p>
-          </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-lg text-amber-600 dark:bg-amber-950/30 dark:text-amber-400">
-            <FaClock />
-          </div>
-        </div>
+      <section
+        aria-label="Dashboard statistics"
+        className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-3 min-[480px]:gap-4"
+      >
+        {stats.map((stat) => (
+          <article
+            key={stat.label}
+            className={`${cardClass} flex min-w-0 items-center justify-between gap-3 p-4 min-[480px]:p-5 sm:p-6`}
+          >
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                {stat.label}
+              </p>
+              <h2 className="mt-2 wrap-break-word text-[clamp(1.5rem,4vw,1.875rem)] font-bold text-gray-950 dark:text-white">
+                {stat.value}
+              </h2>
+              <p className="mt-1 text-xs leading-5 text-gray-400">
+                {stat.description}
+              </p>
+            </div>
+            <div
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-lg min-[480px]:h-12 min-[480px]:w-12 ${stat.iconClass}`}
+              aria-hidden="true"
+            >
+              {stat.icon}
+            </div>
+          </article>
+        ))}
       </section>
 
-      {/* Create Event Form */}
+      {/* Create event form */}
       {showEventForm && (
-        <section className={`${cardClass} p-5 sm:p-8`}>
+        <section className={`${cardClass} p-4 min-[480px]:p-6 sm:p-8`}>
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-950 dark:text-white sm:text-2xl">
+            <h2 className="text-xl font-bold text-gray-950 sm:text-2xl dark:text-white">
               Create New Event
             </h2>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm leading-6 text-gray-500 dark:text-gray-400">
               Add the details below to publish your event.
             </p>
           </div>
 
           <form
             onSubmit={handleCreateEvent}
-            className="grid grid-cols-1 gap-5 md:grid-cols-2"
+            className="grid min-w-0 grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2"
           >
-            <div>
-              <label className={labelClass}>Event title</label>
+            <div className="min-w-0">
+              <label className={labelClass} htmlFor="event-title">
+                Event title
+              </label>
               <input
+                id="event-title"
                 required
                 type="text"
                 placeholder="Enter event title"
@@ -355,9 +360,12 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div>
-              <label className={labelClass}>Category</label>
+            <div className="min-w-0">
+              <label className={labelClass} htmlFor="event-category">
+                Category
+              </label>
               <input
+                id="event-category"
                 required
                 type="text"
                 placeholder="e.g. Technology, Music"
@@ -369,9 +377,12 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div>
-              <label className={labelClass}>Event date</label>
+            <div className="min-w-0">
+              <label className={labelClass} htmlFor="event-date">
+                Event date
+              </label>
               <input
+                id="event-date"
                 required
                 type="date"
                 min={new Date().toLocaleDateString("en-CA")}
@@ -383,9 +394,12 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div>
-              <label className={labelClass}>Location</label>
+            <div className="min-w-0">
+              <label className={labelClass} htmlFor="event-location">
+                Location
+              </label>
               <input
+                id="event-location"
                 required
                 type="text"
                 placeholder="Enter venue or location"
@@ -397,9 +411,12 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div>
-              <label className={labelClass}>Total seats</label>
+            <div className="min-w-0">
+              <label className={labelClass} htmlFor="event-seats">
+                Total seats
+              </label>
               <input
+                id="event-seats"
                 required
                 type="number"
                 min="1"
@@ -412,9 +429,12 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div>
-              <label className={labelClass}>Ticket price (₹)</label>
+            <div className="min-w-0">
+              <label className={labelClass} htmlFor="event-price">
+                Ticket price (₹)
+              </label>
               <input
+                id="event-price"
                 required
                 type="number"
                 min="0"
@@ -427,9 +447,12 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className={labelClass}>Image URL (optional)</label>
+            <div className="min-w-0 md:col-span-2">
+              <label className={labelClass} htmlFor="event-image">
+                Image URL (optional)
+              </label>
               <input
+                id="event-image"
                 type="url"
                 placeholder="https://example.com/image.jpg"
                 className={inputClass}
@@ -440,13 +463,16 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className={labelClass}>Event description</label>
+            <div className="min-w-0 md:col-span-2">
+              <label className={labelClass} htmlFor="event-description">
+                Event description
+              </label>
               <textarea
+                id="event-description"
                 required
                 rows={4}
                 placeholder="Describe your event..."
-                className={inputClass}
+                className={`${inputClass} min-h-28 resize-y`}
                 value={formData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
@@ -454,11 +480,11 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row md:col-span-2">
+            <div className="flex min-w-0 flex-col gap-3 min-[480px]:flex-row md:col-span-2">
               <button
                 type="submit"
                 disabled={savingEvent}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gray-950 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-gray-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60 min-[480px]:w-auto dark:bg-white dark:text-gray-950 dark:hover:bg-gray-200"
               >
                 <FaPlus />
                 {savingEvent ? "Publishing..." : "Publish Event"}
@@ -470,7 +496,7 @@ const AdminDashboard = () => {
                   setShowEventForm(false);
                   setFormData(initialForm);
                 }}
-                className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#252932]"
+                className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 min-[480px]:w-auto dark:border-gray-700 dark:text-gray-300 dark:hover:bg-[#252932]"
               >
                 Cancel
               </button>
@@ -479,24 +505,27 @@ const AdminDashboard = () => {
         </section>
       )}
 
-      {/* Events and Booking Requests */}
-      <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-2">
+      {/* Events and booking requests */}
+      <div className="grid min-w-0 grid-cols-1 items-start gap-6 xl:grid-cols-2 xl:gap-8">
         {/* Events */}
-        <section>
+        <section className="min-w-0">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-3 text-xl font-bold text-gray-950 dark:text-white">
-              <FaCalendarAlt className="text-gray-500 dark:text-gray-400" />
-              All Events
+            <h2 className="flex min-w-0 items-center gap-2 text-lg font-bold text-gray-950 min-[480px]:gap-3 min-[480px]:text-xl dark:text-white">
+              <FaCalendarAlt
+                className="shrink-0 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+              />
+              <span>All Events</span>
             </h2>
-            <span className="rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
+            <span className="shrink-0 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
               {events.length}
             </span>
           </div>
 
           <div className={`${cardClass} overflow-hidden`}>
-            <ul className="divide-y divide-gray-100 overflow-y-auto dark:divide-gray-800">
+            <ul className="divide-y divide-gray-100 dark:divide-gray-800">
               {events.length === 0 ? (
-                <li className="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <li className="p-6 text-center text-sm text-gray-500 sm:p-8 dark:text-gray-400">
                   No events created yet.
                 </li>
               ) : (
@@ -506,31 +535,37 @@ const AdminDashboard = () => {
                   return (
                     <li
                       key={event._id}
-                      className="flex flex-col gap-4 p-5 transition hover:bg-gray-50 dark:hover:bg-[#252932] sm:flex-row sm:items-center sm:justify-between"
+                      className="flex min-w-0 flex-col gap-4 p-4 transition hover:bg-gray-50 min-[480px]:p-5 sm:flex-row sm:items-start sm:justify-between dark:hover:bg-[#252932]"
                     >
-                      <div className="min-w-0">
-                        <h3 className="font-bold text-gray-950 dark:text-white">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="wrap-break-word font-bold leading-snug text-gray-950 dark:text-white">
                           {event.title}
                         </h3>
 
-                        <p className="mt-1 text-xs font-medium uppercase tracking-wide text-gray-400">
+                        <p className="mt-1 wrap-break-word text-xs font-medium uppercase tracking-wide text-gray-400">
                           {event.category || "Event"}
                         </p>
 
-                        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="flex items-center gap-2">
-                            <FaCalendarAlt className="text-gray-400" />
-                            {formatDate(event.date)}
+                        <div className="mt-3 flex min-w-0 flex-col gap-2 text-sm text-gray-500 min-[400px]:flex-row min-[400px]:flex-wrap min-[400px]:gap-x-4 dark:text-gray-400">
+                          <span className="flex min-w-0 items-start gap-2">
+                            <FaCalendarAlt
+                              className="mt-1 shrink-0 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <span>{formatDate(event.date)}</span>
                           </span>
 
-                          <span className="flex items-center gap-2">
-                            <FaMapMarkerAlt className="text-gray-400" />
-                            {event.location}
+                          <span className="flex min-w-0 items-start gap-2">
+                            <FaMapMarkerAlt
+                              className="mt-1 shrink-0 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <span className="wrap-break-word">{event.location}</span>
                           </span>
                         </div>
 
                         <span
-                          className={`mt-3 inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                          className={`mt-3 inline-flex max-w-full rounded-full border px-2.5 py-1 text-xs font-semibold ${
                             soldOut
                               ? "border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"
                               : "border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300"
@@ -544,9 +579,9 @@ const AdminDashboard = () => {
                         type="button"
                         onClick={() => handleDeleteEvent(event._id)}
                         disabled={actionId === event._id}
-                        className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/30"
+                        className="inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50 sm:w-auto dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950/30"
                       >
-                        <FaTrash />
+                        <FaTrash aria-hidden="true" />
                         {actionId === event._id ? "Deleting..." : "Delete"}
                       </button>
                     </li>
@@ -557,22 +592,25 @@ const AdminDashboard = () => {
           </div>
         </section>
 
-        {/* Booking Requests */}
-        <section>
+        {/* Booking requests */}
+        <section className="min-w-0">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-3 text-xl font-bold text-gray-950 dark:text-white">
-              <FaTicketAlt className="text-gray-500 dark:text-gray-400" />
-              Booking Requests
+            <h2 className="flex min-w-0 items-center gap-2 text-lg font-bold text-gray-950 min-[480px]:gap-3 min-[480px]:text-xl dark:text-white">
+              <FaTicketAlt
+                className="shrink-0 text-gray-500 dark:text-gray-400"
+                aria-hidden="true"
+              />
+              <span>Booking Requests</span>
             </h2>
-            <span className="rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
+            <span className="shrink-0 rounded-full border border-gray-200 px-3 py-1 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300">
               {bookings.length}
             </span>
           </div>
 
           <div className={`${cardClass} overflow-hidden`}>
-            <ul className=" divide-y divide-gray-100 overflow-y-auto dark:divide-gray-800">
+            <ul className="divide-y divide-gray-100 dark:divide-gray-800">
               {bookings.length === 0 ? (
-                <li className="p-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                <li className="p-6 text-center text-sm text-gray-500 sm:p-8 dark:text-gray-400">
                   No booking requests yet.
                 </li>
               ) : (
@@ -588,41 +626,44 @@ const AdminDashboard = () => {
                       : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-300";
 
                   return (
-                    <li key={booking._id} className="p-5">
-                      <div className="mb-4 flex items-start justify-between gap-3">
+                    <li
+                      key={booking._id}
+                      className="min-w-0 p-4 min-[480px]:p-5"
+                    >
+                      <div className="mb-4 flex min-w-0 flex-col gap-3 min-[420px]:flex-row min-[420px]:items-start min-[420px]:justify-between">
                         <div className="min-w-0">
-                          <h3 className="font-bold leading-snug text-gray-950 dark:text-white">
+                          <h3 className="wrap-break-word font-bold leading-snug text-gray-950 dark:text-white">
                             {booking.eventId?.title || "Deleted Event"}
                           </h3>
-                          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                          <p className="mt-1 wrap-break-word text-sm text-gray-500 dark:text-gray-400">
                             {booking.userId?.name || "Unknown user"}
                           </p>
                         </div>
 
-                        <div className="flex shrink-0 flex-col items-end gap-2">
+                        <div className="flex min-w-0 flex-wrap items-center gap-2 min-[420px]:shrink-0 min-[420px]:flex-col min-[420px]:items-end">
                           <span
-                            className={`rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${statusClass}`}
+                            className={`max-w-full rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${statusClass}`}
                           >
                             {booking.status}
                           </span>
 
                           {!isCancelled && booking.paymentStatus && (
-                            <span className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-600 dark:border-gray-700 dark:bg-[#252932] dark:text-gray-300">
+                            <span className="max-w-full rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-gray-600 dark:border-gray-700 dark:bg-[#252932] dark:text-gray-300">
                               {booking.paymentStatus.replace(/_/g, " ")}
                             </span>
                           )}
                         </div>
                       </div>
 
-                      <div className="space-y-2 rounded-xl border border-gray-100 bg-gray-50 p-3 text-sm dark:border-gray-800 dark:bg-[#15171C]">
-                        <p className="break-words text-gray-600 dark:text-gray-300">
+                      <div className="min-w-0 space-y-2 rounded-xl border border-gray-100 bg-gray-50 p-3 text-sm dark:border-gray-800 dark:bg-[#15171C]">
+                        <p className="wrap-break-word text-gray-600 dark:text-gray-300">
                           <span className="font-medium text-gray-500 dark:text-gray-400">
                             Email:{" "}
                           </span>
                           {booking.userId?.email || "Unavailable"}
                         </p>
 
-                        <p className="text-gray-600 dark:text-gray-300">
+                        <p className="wrap-break-word text-gray-600 dark:text-gray-300">
                           <span className="font-medium text-gray-500 dark:text-gray-400">
                             Amount:{" "}
                           </span>
@@ -631,7 +672,7 @@ const AdminDashboard = () => {
                             : `₹${booking.amount}`}
                         </p>
 
-                        <p className="text-gray-600 dark:text-gray-300">
+                        <p className="wrap-break-word text-gray-600 dark:text-gray-300">
                           <span className="font-medium text-gray-500 dark:text-gray-400">
                             Requested:{" "}
                           </span>
@@ -639,7 +680,7 @@ const AdminDashboard = () => {
                         </p>
 
                         {booking.eventId && (
-                          <p className="text-gray-600 dark:text-gray-300">
+                          <p className="wrap-break-word text-gray-600 dark:text-gray-300">
                             <span className="font-medium text-gray-500 dark:text-gray-400">
                               Event availability:{" "}
                             </span>
@@ -651,33 +692,40 @@ const AdminDashboard = () => {
                       </div>
 
                       {isPending && (
-                        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                        <div className="mt-4 grid grid-cols-1 gap-2 min-[480px]:grid-cols-2">
                           <button
                             type="button"
                             disabled={actionId === booking._id}
                             onClick={() =>
                               handleConfirmBooking(booking._id)
                             }
-                            className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-xs font-semibold text-green-700 transition hover:bg-green-600 hover:text-white disabled:opacity-50 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
+                            className="inline-flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2.5 text-xs font-semibold text-green-700 transition hover:bg-green-600 hover:text-white disabled:opacity-50 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-white"
                           >
-                            <FaCheck />
-                            Confirm booking
+                            <FaCheck aria-hidden="true" />
+                            {actionId === booking._id
+                              ? "Processing..."
+                              : "Confirm booking"}
                           </button>
 
                           <button
                             type="button"
                             disabled={actionId === booking._id}
-                            onClick={() => handleCancelBooking(booking._id)}
-                            className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-500 hover:text-white disabled:opacity-50 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300 dark:hover:bg-red-700 dark:hover:text-white"
+                            onClick={() =>
+                              handleCancelBooking(booking._id)
+                            }
+                            className="inline-flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-xs font-semibold text-red-600 transition hover:bg-red-500 hover:text-white disabled:opacity-50 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300 dark:hover:bg-red-700 dark:hover:text-white"
                           >
-                            <FaBan />
+                            <FaBan aria-hidden="true" />
                             Reject
                           </button>
                         </div>
                       )}
 
                       {actionId === booking._id && (
-                        <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                        <p
+                          role="status"
+                          className="mt-3 text-xs text-gray-500 dark:text-gray-400"
+                        >
                           Processing request...
                         </p>
                       )}
@@ -689,7 +737,7 @@ const AdminDashboard = () => {
           </div>
         </section>
       </div>
-    </div>
+    </main>
   );
 };
 
